@@ -1,103 +1,90 @@
-import Image from "next/image";
+'use client';
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [patreonAuthUrl, setPatreonAuthUrl] = useState("");
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  useEffect(() => {
+    // Build the Patreon OAuth URL with all required parameters
+    const clientId = "fEG_RiULN1gU8pbMxJPaTmscjZdh3iM_z3oAAATr8BeBRux4K2PmQbWrzpImWb9y";
+    const redirectUri = encodeURIComponent("http://localhost:3000/api/auth/callback/patreon");
+    const scope = encodeURIComponent("identity identity[email] identity.memberships campaigns campaigns.members");
+    
+    const authUrl = `https://www.patreon.com/oauth2/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
+    
+    setPatreonAuthUrl(authUrl);
+  }, []);
+
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-center p-6 bg-gradient-to-b from-white to-gray-100">
+      <div className="w-full max-w-3xl flex flex-col items-center gap-8">
+        {/* Header */}
+        <div className="flex flex-col items-center gap-2 mb-8">
+          <h1 className="text-4xl font-bold text-center">
+            Patreon OAuth Demo
+          </h1>
+          <p className="text-lg text-gray-600 text-center max-w-md">
+            A simple demo showing how to integrate Patreon OAuth with Next.js
+          </p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+
+        {/* Main Card */}
+        <Card className="w-full shadow-lg">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl">Welcome to the Demo</CardTitle>
+            <CardDescription>
+              This app demonstrates how to implement Patreon OAuth2 authentication
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col items-center gap-6">
+            <div className="max-w-md text-center">
+              <p className="mb-4">
+                Click the button below to authenticate with your Patreon account.
+                This demo will request permission to access your basic profile info
+                and patron status.
+              </p>
+            </div>
+            
+            {/* Patreon Login Button */}
+            <Link 
+              href={patreonAuthUrl} 
+              className="w-full max-w-xs"
+            >
+              <div className="w-full bg-[#F96854] hover:bg-[#F96854]/90 text-white flex items-center justify-center gap-2 h-10 rounded-md px-6 font-medium">
+                <svg 
+                  width="24" 
+                  height="24" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  className="w-5 h-5"
+                >
+                  <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                  <polyline points="14 2 14 8 20 8" />
+                </svg>
+                Login with Patreon
+              </div>
+            </Link>
+          </CardContent>
+          <CardFooter className="flex justify-center text-sm text-gray-500">
+            Your data is only used for this demo and not stored anywhere
+          </CardFooter>
+        </Card>
+
+        {/* Project Info */}
+        <div className="text-center text-sm text-gray-500 mt-8">
+          <p>
+            Built with Next.js App Router and ShadCN UI
+          </p>
+        </div>
+      </div>
+    </main>
   );
 }
