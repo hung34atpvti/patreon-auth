@@ -17,6 +17,13 @@ export default function Dashboard() {
     const email = searchParams.get("email");
     const patronStatus = searchParams.get("patronStatus");
     const supportAmount = searchParams.get("supportAmount");
+    const imageUrl = searchParams.get("imageUrl");
+    const thumbUrl = searchParams.get("thumbUrl");
+    const profileUrl = searchParams.get("profileUrl");
+    const userId = searchParams.get("userId");
+    const lifetimeSupport = searchParams.get("lifetimeSupport");
+    const campaignName = searchParams.get("campaignName");
+    const campaignUrl = searchParams.get("campaignUrl");
 
     if (name && email) {
       setUserData({
@@ -24,6 +31,13 @@ export default function Dashboard() {
         email,
         patronStatus,
         supportAmount: parseInt(supportAmount || "0", 10) / 100, // Convert cents to dollars
+        lifetimeSupport: parseInt(lifetimeSupport || "0", 10) / 100, // Convert cents to dollars
+        imageUrl,
+        thumbUrl,
+        profileUrl,
+        userId,
+        campaignName,
+        campaignUrl
       });
     } else {
       // No user data in URL, user might have accessed page directly
@@ -85,13 +99,24 @@ export default function Dashboard() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-6 bg-gradient-to-b from-white to-gray-100">
       <div className="w-full max-w-3xl flex flex-col items-center gap-8">
-        <div className="flex flex-col items-center gap-2">
-          <h1 className="text-3xl font-bold text-center">
-            Welcome, {userData.name}!
-          </h1>
-          <p className="text-lg text-gray-600 text-center">
-            You&apos;ve successfully logged in with Patreon
-          </p>
+        <div className="flex flex-col items-center gap-4">
+          {userData.imageUrl && (
+            <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-orange-500 shadow-md">
+              <img 
+                src={userData.imageUrl} 
+                alt={`${userData.name}'s profile`}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
+          <div className="text-center">
+            <h1 className="text-3xl font-bold">
+              Welcome, {userData.name}!
+            </h1>
+            <p className="text-lg text-gray-600">
+              You&apos;ve successfully logged in with Patreon
+            </p>
+          </div>
         </div>
 
         <Card className="w-full shadow-lg">
@@ -124,6 +149,52 @@ export default function Dashboard() {
                 <div className="space-y-1">
                   <h3 className="text-sm font-medium text-gray-500">Support Amount</h3>
                   <p className="text-lg">${userData.supportAmount.toFixed(2)} per month</p>
+                </div>
+              )}
+              
+              {userData.userId && (
+                <div className="space-y-1">
+                  <h3 className="text-sm font-medium text-gray-500">Patreon User ID</h3>
+                  <p className="text-lg">{userData.userId}</p>
+                </div>
+              )}
+              
+              {userData.profileUrl && (
+                <div className="space-y-1">
+                  <h3 className="text-sm font-medium text-gray-500">Patreon Profile</h3>
+                  <a 
+                    href={userData.profileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-lg text-blue-600 hover:text-blue-800 hover:underline"
+                  >
+                    View Profile
+                  </a>
+                </div>
+              )}
+              
+              {userData.lifetimeSupport > 0 && (
+                <div className="space-y-1">
+                  <h3 className="text-sm font-medium text-gray-500">Lifetime Support</h3>
+                  <p className="text-lg">${userData.lifetimeSupport.toFixed(2)}</p>
+                </div>
+              )}
+              
+              {userData.campaignName && (
+                <div className="space-y-1">
+                  <h3 className="text-sm font-medium text-gray-500">Supporting Campaign</h3>
+                  {userData.campaignUrl ? (
+                    <a 
+                      href={userData.campaignUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-lg text-blue-600 hover:text-blue-800 hover:underline"
+                    >
+                      {userData.campaignName}
+                    </a>
+                  ) : (
+                    <p className="text-lg">{userData.campaignName}</p>
+                  )}
                 </div>
               )}
             </div>

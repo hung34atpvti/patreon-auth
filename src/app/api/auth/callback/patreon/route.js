@@ -46,30 +46,59 @@ export async function GET(request) {
     );
     
     const userData = userInfoResponse.data;
-    
     // Store user data in session or cookie
     // For this demo, we'll redirect to the dashboard with user info in query params
     const user = userData.data;
-    const memberships = userData.included || [];
-    
-    // Find user's patron status if they have memberships
+    const memberships = user.relationships.memberships || [];
+    // Find user's patron status and membership data
     let patronStatus = "not_patron";
     let supportAmountCents = 0;
+    let lifetimeSupportCents = 0;
+    let campaignName = "";
+    let campaignUrl = "";
     
     if (memberships.length > 0) {
+      // Find the member data
       const membership = memberships.find(item => item.type === "member");
       if (membership) {
         patronStatus = membership.attributes.patron_status || "not_patron";
         supportAmountCents = membership.attributes.currently_entitled_amount_cents || 0;
+        lifetimeSupportCents = membership.attributes.lifetime_support_cents || 0;
+        
+        // If there are relationship data, get the campaign ID
+        if (membership.relationships && 
+            membership.relationships.campaign && 
+            membership.relationships.campaign.data) {
+          const campaignId = membership.relationships.campaign.data.id;
+          
+          // Find the campaign data
+          const campaign = memberships.find(item => 
+            item.type === "campaign" && item.id === campaignId);
+          
+          if (campaign && campaign.attributes) {
+            campaignName = campaign.attributes.name || "";
+            campaignUrl = campaign.attributes.url || "";
+          }
+        }
       }
     }
     
     // Create a safe URL with user data as query parameters
     const dashboardUrl = new URL(`${process.env.NEXTAUTH_URL}/dashboard`);
-    dashboardUrl.searchParams.set("name", user.attributes.full_name || "");
+    // User data
+    dashboardUrl.searchParams.set("name", user.attributes.full_name || user.attributes.first_name || "");
     dashboardUrl.searchParams.set("email", user.attributes.email || "");
+    dashboardUrl.searchParams.set("imageUrl", user.attributes.image_url || "");
+    dashboardUrl.searchParams.set("thumbUrl", user.attributes.thumb_url || "");
+    dashboardUrl.searchParams.set("profileUrl", user.attributes.url || "");
+    dashboardUrl.searchParams.set("userId", user.id || "");
+    
+    // Membership data
     dashboardUrl.searchParams.set("patronStatus", patronStatus);
     dashboardUrl.searchParams.set("supportAmount", supportAmountCents.toString());
+    dashboardUrl.searchParams.set("lifetimeSupport", lifetimeSupportCents.toString());
+    dashboardUrl.searchParams.set("campaignName", campaignName);
+    dashboardUrl.searchParams.set("campaignUrl", campaignUrl);
     
     // Redirect to the dashboard
     return NextResponse.redirect(dashboardUrl.toString());
